@@ -1,0 +1,10 @@
+{
+  "name": "university-of-denver/quicksilver-qa-prep",
+  "description": "Prepare a Pantheon environment for automated QA tests by enabling the testing module and granting login roles",
+  "homepage": "https://github.com/DU-University-Relations/quicksilver-qa-prep",
+  "type": "quicksilver-script",
+  "require": {
+    "composer/installers": "~1.0"
+  },
+  "license": "MIT"
+}
