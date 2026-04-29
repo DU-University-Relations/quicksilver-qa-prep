@@ -8,16 +8,22 @@ after every database clone:
    ```bash
    terminus drush "$SITE.$ENV" -- en du_functional_testing -y
    ```
-2. **Grant all Drupal roles to QA login user(s)** – equivalent to the
-   `grant-login-roles` npm script in `du-playwright`, which wraps
-   `drush user:role:add` calls for every role returned by `drush role:list`.
+2. **Grant the `legacy_test_and_training_accounts` role to every `qa_*` test
+   user** – the `du_functional_testing` module creates one test user per
+   non-built-in Drupal role (e.g. `qa_administrator`, `qa_editor`, …). The
+   `legacy_test_and_training_accounts` role allows those accounts to bypass
+   SSO/SAML during automated testing.
 
 The script is triggered automatically by the Pantheon `env:clone` workflow
 (database clone), so no manual intervention is required after a sync.
 
+> **Note:** The `du_functional_testing` install hook is known to sometimes
+> return a non-zero exit code. The script logs any such error and continues
+> regardless, because the `qa_*` test users are still created even when the
+> hook exits with an error.
+
 This project was developed from a template for new Quicksilver projects to utilize so
 that Quicksilver scripts can be installed through Composer.
-
 
 Original template: https://github.com/pantheon-quicksilver/quicksilver-template
 
@@ -27,8 +33,7 @@ Original template: https://github.com/pantheon-quicksilver/quicksilver-template
 - Composer
 - Drupal 9+ site running on Pantheon with the `du_functional_testing` module
   available in the codebase
-- (Optional) `qa_login_users` secret set via Terminus Secrets Manager – see
-  [Configuration](#configuration) below
+- The `legacy_test_and_training_accounts` role must exist on the site
 
 ## Installation
 
@@ -74,29 +79,18 @@ workflows:
         script: private/scripts/quicksilver/university-of-denver/quicksilver-qa-prep/qa-prep.php
 ```
 
-### Configuration
-
-The only optional configuration is the list of Drupal usernames that should
-receive all available roles after a database clone.
-
-| Pantheon Secret   | Description                                                                 | Default    |
-|-------------------|-----------------------------------------------------------------------------|------------|
-| `qa_login_users`  | Comma-separated list of Drupal usernames to grant all roles (e.g. `qa_user,tester`) | `qa_user`  |
-
-Set the secret via [Terminus Secrets Manager](https://github.com/pantheon-systems/terminus-secrets-manager-plugin):
-
-```bash
-terminus secret:site:set <site-name> qa_login_users "qa_user,another_test_user"
-```
-
 ### What the script does
 
 1. Runs `drush en du_functional_testing -y` to enable the functional testing
-   module on the cloned environment.
+   module, which creates `qa_*` test user accounts (one per non-built-in role).
+   Any errors from the install hook are logged but do **not** stop execution.
 2. Runs `drush role:list --format=json` to retrieve all role machine names
    (excluding the built-in `anonymous` and `authenticated` roles).
-3. For each username listed in `qa_login_users`, verifies the account exists
-   and then runs `drush user:role:add <role> <username>` for every role.
+3. For each role, derives the corresponding `qa_` username
+   (e.g. `administrator` → `qa_administrator`) and runs
+   `drush user:role:add legacy_test_and_training_accounts <username>`.
 
-If a user does not exist on the cloned environment the script emits a warning
-and continues rather than failing the workflow.
+If a `qa_*` user does not exist on the cloned environment the script emits a
+warning and continues rather than failing the workflow.
+
+No Pantheon secrets are required.
