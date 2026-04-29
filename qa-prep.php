@@ -15,6 +15,17 @@
  */
 
 // ---------------------------------------------------------------------------
+// 0. Environment guard – only run on dev and test environments.
+// ---------------------------------------------------------------------------
+$allowed_envs = ['dev', 'test'];
+$current_env = $_ENV['PANTHEON_ENVIRONMENT'] ?? getenv('PANTHEON_ENVIRONMENT') ?: 'unknown';
+
+if (!in_array($current_env, $allowed_envs, TRUE)) {
+  echo "Skipping QA prep: current environment '{$current_env}' is not dev or test.\n";
+  exit(0);
+}
+
+// ---------------------------------------------------------------------------
 // 1. Enable du_functional_testing module.
 //    Errors from the install hook are non-fatal – log and continue.
 // ---------------------------------------------------------------------------

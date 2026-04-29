@@ -17,6 +17,10 @@ after every database clone:
 The script is triggered automatically by the Pantheon `env:clone` workflow
 (database clone), so no manual intervention is required after a sync.
 
+> **Environment restriction:** The script only executes on the **dev** and
+> **test** Pantheon environments. If it runs on any other environment (e.g.
+> **live**), it exits immediately without making changes.
+
 > **Note:** The `du_functional_testing` install hook is known to sometimes
 > return a non-zero exit code. The script logs any such error and continues
 > regardless, because the `qa_*` test users are still created even when the
