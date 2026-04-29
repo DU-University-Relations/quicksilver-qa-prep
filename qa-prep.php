@@ -73,36 +73,11 @@ echo 'QA users to update: ' . implode(', ', $qa_users) . "\n\n";
 // 3. Grant legacy_test_and_training_accounts to each qa_* user.
 //    This role allows test accounts to bypass SSO/SAML.
 // ---------------------------------------------------------------------------
-$role_to_grant = 'legacy_test_and_training_accounts';
-$all_success = TRUE;
-
 foreach ($qa_users as $username) {
-  echo "Granting '{$role_to_grant}' to user '{$username}'...\n";
-
-  // Verify the user exists before attempting to assign the role.
-  $check_output = [];
-  $check_code = 0;
-  exec('drush user:information --format=json ' . escapeshellarg($username) . ' 2>&1', $check_output, $check_code);
-  if ($check_code !== 0) {
-    echo "Warning: User '{$username}' not found – skipping.\n\n";
-    continue;
-  }
-
-  $add_output = [];
-  $add_code = 0;
-  exec('drush user:role:add ' . escapeshellarg($role_to_grant) . ' ' . escapeshellarg($username) . ' 2>&1', $add_output, $add_code);
-  if ($add_code !== 0) {
-    echo "Warning: Could not assign '{$role_to_grant}' to '{$username}': " . implode(' ', $add_output) . "\n\n";
-    $all_success = FALSE;
-  }
-  else {
-    echo "  Role '{$role_to_grant}' granted to '{$username}'.\n\n";
-  }
+  echo "Granting legacy_test_and_training_accounts to '{$username}'...\n";
+  $output = [];
+  exec("drush user:role:add legacy_test_and_training_accounts $username 2>&1", $output);
+  echo implode("\n", $output) . "\n";
 }
 
-if ($all_success) {
-  echo "QA environment preparation complete.\n";
-}
-else {
-  echo "QA environment preparation finished with warnings. Review output above.\n";
-}
+echo "QA environment preparation complete.\n";
