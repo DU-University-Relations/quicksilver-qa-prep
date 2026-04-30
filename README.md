@@ -76,7 +76,7 @@ whenever a database clone occurs (e.g. syncing Live → Test or Test → Dev):
 api_version: 1
 
 workflows:
-  env_clone:
+  clone_database:
     after:
       - type: webphp
         description: Prepare environment for QA tests
