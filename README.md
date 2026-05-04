@@ -80,7 +80,7 @@ workflows:
     after:
       - type: webphp
         description: Prepare environment for QA tests
-        script: private/scripts/quicksilver/university-of-denver/quicksilver-qa-prep/qa-prep.php
+        script: private/scripts/quicksilver/quicksilver-qa-prep/qa-prep.php
 ```
 
 ### What the script does
