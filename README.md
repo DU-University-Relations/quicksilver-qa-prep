@@ -55,7 +55,7 @@ file:
   },
   "extra": {
     "installer-paths": {
-      "web/private/scripts/quicksilver": ["type:quicksilver-script"]
+      "web/private/scripts/quicksilver/{$name}/": ["type:quicksilver-script"]
     }
   }
 }
